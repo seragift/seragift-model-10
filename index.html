@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   0. DESIGN TOKENS
+   ============================================================ */
+:root{
+  --cream:#FFF6F8;
+  --blush:#FCE1E9;
+  --rose:#F5BFD1;
+  --rose-gold:#E88AA8;
+  --rose-gold-dark:#D9678F;
+  --ink:#6B3550;
+  --ink-soft:#A6647E;
+  --white:#FFFFFF;
+  --shadow: 0 18px 40px -12px rgba(214,104,140,0.35);
+  --font-display:'Playfair Display', serif;
+  --font-script:'Cormorant Garamond', serif;
+  --font-body:'Quicksand', sans-serif;
+  --vh: 1vh;
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{
+  margin:0; padding:0; width:100%;
+  height:calc(var(--vh, 1vh) * 100);
+  overflow:hidden;
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:var(--cream);
+  -webkit-font-smoothing:antialiased;
+}
+button{ font-family:inherit; }
+img{ -webkit-user-drag:none; user-select:none; pointer-events:none; }
+
+.stage{
+  position:fixed; inset:0; width:100%;
+  height:calc(var(--vh, 1vh) * 100);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  contain: layout style paint;
+}
+.hidden{ display:none !important; }
+
+/* Frame the experience nicely on tablet / desktop like a phone canvas */
+.phone-frame{
+  position:relative; width:100%; max-width:480px;
+  height:100%; margin:0 auto; overflow:hidden;
+  box-shadow: 0 0 60px rgba(0,0,0,0.15);
+}
+@media (min-width:560px){
+  body{ background: linear-gradient(160deg,#FBDCE6,#F0A9C6); }
+  .phone-frame{ height:min(calc(var(--vh, 1vh) * 100), 900px); border-radius:28px; margin-top:calc((100vh - min(calc(var(--vh, 1vh) * 100), 900px))/2); }
+}
+
+/* ============================================================
+   1. LOADING SCREEN
+   ============================================================ */
+#loading-screen{
+  background: radial-gradient(ellipse at 50% 30%, #FFF3F7 0%, #FBDCE9 55%, #F3B4CE 100%);
+  flex-direction:column; gap:22px; z-index:100;
+}
+.flower-ring{
+  position:relative; width:150px; height:150px;
+}
+.flower-ring img{
+  position:absolute; width:56px; height:56px; top:50%; left:50%;
+  transform-origin:center;
+  filter:drop-shadow(0 4px 8px rgba(214,104,140,0.25));
+}
+.flower-ring{ animation: ring-spin 6s linear infinite; }
+@keyframes ring-spin{ to{ transform:rotate(360deg); } }
+.loading-label{
+  font-family:var(--font-script); font-style:italic; font-size:20px;
+  letter-spacing:4px; color:var(--rose-gold-dark); text-transform:uppercase;
+  animation: fade-inout 1.6s ease-in-out infinite;
+}
+@keyframes fade-inout{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
+
+/* ============================================================
+   2. PIN SCREEN
+   ============================================================ */
+#pin-screen{
+  background-size:cover; background-position:center;
+  z-index:90;
+}
+#pin-screen .phone-frame{
+  display:flex; align-items:center; justify-content:center;
+}
+#pin-screen .bg-photo{
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  filter:blur(2px) saturate(1.05);
+  transform:scale(1.08);
+}
+#pin-screen .bg-overlay{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(255,240,246,.55), rgba(230,150,185,.5));
+  backdrop-filter: blur(1px);
+}
+#pin-ambient{ position:absolute; inset:0; overflow:hidden; z-index:1; pointer-events:none; }
+.pin-card{
+  position:relative; z-index:2; width:88%; max-width:340px;
+  max-height:94%; overflow-y:auto;
+  display:flex; flex-direction:column; align-items:center;
+  gap:clamp(4px,1.4vh,10px);
+  padding:clamp(16px,4vh,28px) clamp(18px,6vw,24px) clamp(18px,4vh,28px);
+  border-radius:26px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:0 24px 50px -18px rgba(214,104,140,.4), inset 0 1px 0 rgba(255,255,255,.55);
+  backdrop-filter: blur(10px);
+  animation: pin-card-in .8s cubic-bezier(.19,1,.22,1) both;
+  scrollbar-width:none;
+}
+.pin-card::-webkit-scrollbar{ display:none; }
+@keyframes pin-card-in{
+  0%{ opacity:0; transform:translateY(28px) scale(.94); }
+  100%{ opacity:1; transform:translateY(0) scale(1); }
+}
+.pin-heart{
+  font-size:clamp(22px,5.5vh,30px); color:var(--rose-gold-dark);
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.12));
+  animation: heart-pulse 2.6s ease-in-out infinite;
+}
+@keyframes heart-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.16); } }
+.pin-title{ font-family:var(--font-display); font-size:clamp(20px,5.5vh,32px); color:var(--ink); margin:2px 0; text-shadow:0 2px 10px rgba(255,255,255,.5); text-align:center; }
+.pin-receiver{ font-family:var(--font-script); font-style:italic; font-size:clamp(15px,4.2vh,22px); color:var(--rose-gold-dark); margin-bottom:2px; text-align:center; }
+.pin-hint{ font-size:clamp(10px,2.6vh,12.5px); letter-spacing:2px; text-transform:uppercase; color:var(--ink-soft); margin-bottom:0; }
+.pin-error{
+  font-size:11.5px; letter-spacing:.5px; color:#C4477A;
+  height:15px; opacity:0; transition:opacity .25s ease; margin-bottom:0;
+}
+.pin-error.show{ opacity:1; }
+.pin-dots{ display:flex; gap:clamp(10px,2.6vh,14px); margin-bottom:clamp(10px,2.4vh,20px); }
+.pin-dot{
+  width:13px; height:13px; border-radius:50%;
+  border:1.5px solid var(--rose-gold-dark); background:transparent;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .18s ease;
+}
+.pin-dot.filled{ background:var(--rose-gold-dark); transform:scale(1.18); }
+.pin-dots.shake{ animation:pin-shake .45s ease; }
+.pin-card.shake{ animation:pin-shake .45s ease; }
+@keyframes pin-shake{
+  0%,100%{ transform:translateX(0); }
+  20%{ transform:translateX(-10px); }
+  40%{ transform:translateX(9px); }
+  60%{ transform:translateX(-7px); }
+  80%{ transform:translateX(5px); }
+}
+.keypad{
+  display:grid; grid-template-columns:repeat(3, clamp(48px,15vw,64px));
+  gap:clamp(8px,2vh,14px); position:relative;
+}
+.key{
+  position:relative; overflow:hidden;
+  width:clamp(48px,15vw,64px); height:clamp(48px,15vw,64px); border-radius:50%;
+  border:1px solid rgba(255,255,255,.65);
+  background:linear-gradient(160deg, rgba(255,255,255,.7), rgba(255,255,255,.4));
+  backdrop-filter: blur(6px);
+  font-size:clamp(16px,3.6vh,20px); color:var(--ink); font-weight:600;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 14px -6px rgba(214,104,140,.35), inset 0 1px 0 rgba(255,255,255,.8);
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+.key:active, .key.pressed{
+  transform:scale(.9);
+  background:linear-gradient(160deg, rgba(255,255,255,.95), rgba(255,255,255,.7));
+  box-shadow:0 3px 8px -4px rgba(214,104,140,.3), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.key.key-del{ font-size:15px; }
+.key-empty{ visibility:hidden; }
+.key-ripple{
+  position:absolute; border-radius:50%; background:rgba(232,150,180,.4);
+  transform:scale(0); pointer-events:none;
+  animation: ripple-out .5s ease-out forwards;
+}
+@keyframes ripple-out{ to{ transform:scale(2.6); opacity:0; } }
+
+/* ============================================================
+   3. FLOWER TRANSITION LAYER
+   ============================================================ */
+#flower-transition{
+  position:fixed; inset:0; z-index:120;
+  pointer-events:none; overflow:hidden;
+  background:transparent;
+  contain: layout style paint;
+}
+#flower-transition.active-bg{ background:radial-gradient(circle at 50% 45%, #FDEFF5, #F6C9DA); }
+.tflower{
+  position:absolute; top:0; left:0; width:38px; height:38px;
+  will-change:transform,opacity; transform:translateZ(0);
+  backface-visibility:hidden;
+  contain: layout style paint;
+  image-rendering:auto;
+}
+.tsun{
+  position:absolute; top:0; left:0; width:200px; height:200px;
+  will-change:transform,opacity; transform:translateZ(0);
+  filter: drop-shadow(0 0 22px rgba(240,140,180,.9)) blur(0.3px);
+  contain: layout style paint;
+}
+.tsun.meteor-blur{ filter: drop-shadow(0 0 30px rgba(233,120,165,.95)) blur(3px); }
+.tsun-trail{
+  position:absolute; top:0; left:0; width:26px; height:26px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,205,225,.95), rgba(233,120,165,0) 70%);
+  will-change:transform,opacity; transform:translateZ(0); pointer-events:none;
+  contain: layout style paint;
+}
+
+/* ============================================================
+   4. LANDING PAGE
+   ============================================================ */
+#landing-page{
+  z-index:10; align-items:flex-start; justify-content:flex-start;
+  background-size:cover; background-position:center;
+}
+#landing-page .bg-photo{
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  animation: kenburns 24s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes kenburns{
+  0%{ transform:scale(1.04) translate(0,0); }
+  100%{ transform:scale(1.16) translate(-2.5%,-2%); }
+}
+/* pattern bunga penuh layar (assets/background.png), on/off via CONFIG.useBackgroundImage */
+#landing-page .bg-photo.bg-pattern{
+  background-repeat:no-repeat;
+  animation: kenburns-pattern 28s ease-in-out infinite alternate;
+}
+@keyframes kenburns-pattern{
+  0%{ transform:scale(var(--bgz,1.35)) translate(0,0); }
+  100%{ transform:scale(calc(var(--bgz,1.35) + 0.12)) translate(-2%,-1.5%); }
+}
+#landing-page .bg-overlay{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(255,244,248,.65), rgba(240,175,200,.5));
+}
+.landing-scroll{
+  position:relative; z-index:2; width:100%; height:100%;
+  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  padding:34px 20px 60px; display:flex; flex-direction:column; align-items:center; gap:26px;
+}
+.landing-scroll::-webkit-scrollbar{ display:none; }
+
+.letter{
+  position:relative; width:100%; max-width:340px;
+  background-image:url('assets/paper.png');
+  background-size:cover; background-position:center;
+  border-radius:6px; box-shadow:var(--shadow);
+  padding:26px 22px 30px;
+  opacity:0; will-change:transform,opacity;
+}
+.letter-corner{
+  position:absolute; font-size:14px; color:var(--rose-gold-dark); opacity:.4; line-height:1;
+}
+.letter-corner.tl{ top:10px; left:12px; }
+.letter-corner.tr{ top:10px; right:12px; transform:scaleX(-1); }
+.letter-corner.bl{ bottom:10px; left:12px; transform:scaleY(-1); }
+.letter-corner.br{ bottom:10px; right:12px; transform:scale(-1,-1); }
+.letter-ornament{
+  text-align:center; font-size:12px; letter-spacing:6px;
+  color:var(--rose-gold-dark); opacity:.85; margin-bottom:10px;
+}
+.letter-title{
+  font-family:var(--font-display); font-size:clamp(22px,7vw,28px);
+  text-align:center; color:var(--ink); margin:0 0 14px;
+}
+.letter-body{
+  font-family:var(--font-script); font-size:18px; line-height:1.65; color:var(--ink);
+  white-space:pre-wrap; min-height:120px;
+}
+.type-cursor{ display:inline-block; width:2px; background:var(--rose-gold-dark); animation:cursor-blink .85s steps(1) infinite; margin-left:1px; }
+@keyframes cursor-blink{ 50%{ opacity:0; } }
+.letter-sign{ text-align:right; font-family:var(--font-script); font-style:italic; margin-top:14px; color:var(--rose-gold-dark); opacity:0; transition:opacity .6s ease; }
+.letter-sign.show{ opacity:1; }
+
+.gallery-heading{
+  width:100%; max-width:340px; text-align:center; opacity:0; will-change:transform,opacity;
+}
+.gallery-heading .eyebrow{ font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--ink-soft); }
+.gallery-heading h3{
+  font-family:var(--font-script); font-style:italic; font-weight:500;
+  font-size:clamp(22px,6.5vw,26px); color:var(--rose-gold-dark); margin:2px 0 0;
+}
+.gallery{
+  display:flex; flex-wrap:wrap; justify-content:center; align-content:flex-start;
+  gap:20px 14px; width:100%; max-width:340px;
+}
+.polaroid-wrap{
+  display:flex; flex-direction:column; align-items:center; gap:6px; width:148px;
+  opacity:0; will-change:transform,opacity;
+}
+.polaroid{
+  position:relative; width:100%; padding:10px 10px 32px;
+  background:var(--white); border-radius:4px; box-shadow:var(--shadow);
+}
+.polaroid-tape{
+  position:absolute; top:-9px; left:50%; transform:translateX(-50%) rotate(-3deg);
+  width:52px; height:18px; border-radius:1px;
+  background:rgba(250,196,214,.8); border:1px solid rgba(255,255,255,.6);
+  box-shadow:0 2px 5px rgba(214,104,140,.25); z-index:2;
+}
+.polaroid-sticker{
+  position:absolute; bottom:7px; right:9px; font-size:12px;
+  color:var(--rose-gold-dark); opacity:.9; transform:rotate(-10deg); z-index:2;
+}
+.polaroid .photo-holder{ position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; border-radius:2px; background:#fbe4ec; }
+.polaroid img.photo{ width:100%; height:100%; object-fit:cover; display:block; }
+.polaroid canvas{ position:absolute; inset:0; width:100%; height:100%; touch-action:none; }
+.polaroid-caption{ position:absolute; bottom:9px; left:0; right:0; text-align:center; font-family:var(--font-script); font-style:italic; color:var(--ink-soft); font-size:12.5px; }
+.scratch-hint{ font-size:10.5px; letter-spacing:1px; color:var(--ink-soft); text-transform:uppercase; opacity:.8; text-align:center; }
+
+.confetti-piece{ position:fixed; top:0; left:0; width:16px; height:16px; z-index:60; pointer-events:none; will-change:transform,opacity; }
+
+/* ambient floating flowers (loading loop under landing page) */
+#ambient-flowers{ position:absolute; inset:0; overflow:hidden; z-index:1; pointer-events:none; will-change:transform; }
+.afl{ position:absolute; top:0; left:0; width:22px; height:22px; opacity:.85; will-change:transform,opacity; transform:translateZ(0); backface-visibility:hidden; }
+
+.sparkle{
+  position:absolute; pointer-events:none; color:var(--rose-gold);
+  font-size:11px; opacity:0; will-change:transform,opacity;
+  animation: sparkle-pulse var(--dur,3.5s) ease-in-out var(--delay,0s) infinite;
+}
+@keyframes sparkle-pulse{
+  0%,100%{ opacity:0; transform:scale(.4) rotate(0deg); }
+  50%{ opacity:.85; transform:scale(1) rotate(90deg); }
+}
+
+/* ============================================================
+   5. ENVELOPE (tap-to-open, before the letter appears)
+   ============================================================ */
+.envelope-wrap{
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  width:100%; max-width:340px; padding-top:6px;
+  opacity:0; will-change:transform,opacity;
+}
+.envelope{
+  position:relative; width:100%; max-width:280px; aspect-ratio:280/180;
+  cursor:pointer; perspective:900px;
+}
+.envelope-shadow{
+  position:absolute; left:6%; right:6%; bottom:-10px; height:18px;
+  background:radial-gradient(ellipse at center, rgba(190,80,120,.35), transparent 70%);
+  filter:blur(2px);
+}
+.envelope-back{
+  position:absolute; inset:0; border-radius:10px;
+  background:linear-gradient(160deg, var(--blush), var(--rose));
+  box-shadow:var(--shadow);
+}
+/* triangle "V" fold lines printed on the envelope body, always visible */
+.envelope-flap-back{
+  position:absolute; inset:0; border-radius:10px; overflow:hidden; pointer-events:none;
+}
+.envelope-flap-back::before{
+  content:''; position:absolute; top:0; left:0; width:0; height:0;
+  border-left:calc(50% + 1px) solid transparent;
+  border-right:calc(50% + 1px) solid transparent;
+  border-top:56% solid rgba(0,0,0,.05);
+}
+.envelope-letter-peek{
+  position:absolute; left:12%; right:12%; top:6%; height:0%;
+  background:var(--cream); border-radius:3px 3px 0 0;
+  box-shadow:0 -2px 6px rgba(0,0,0,.08);
+  transition: height .5s cubic-bezier(.19,1,.22,1);
+}
+.envelope.open .envelope-letter-peek{ height:46%; }
+.envelope-flap{
+  position:absolute; top:0; left:0; width:0; height:0; z-index:3;
+  border-left:140px solid transparent;
+  border-right:140px solid transparent;
+  border-top:98px solid var(--rose-gold);
+  transform-origin:50% 0%;
+  transition: transform .7s cubic-bezier(.65,0,.35,1);
+  filter:drop-shadow(0 3px 5px rgba(214,104,140,.3));
+}
+.envelope.open .envelope-flap{ transform: rotateX(180deg); }
+.envelope-seal{
+  position:absolute; top:26%; left:50%; transform:translate(-50%,-50%);
+  z-index:4; width:38px; height:38px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #FBD3E1, var(--rose-gold-dark));
+  color:#fff; font-size:16px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 10px -3px rgba(214,104,140,.5);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.envelope.open .envelope-seal{ opacity:0; transform:translate(-50%,-50%) scale(.4); }
+.envelope-hint{
+  font-size:11.5px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-soft);
+  animation: hint-bob 1.8s ease-in-out infinite;
+}
+.envelope.open ~ .envelope-hint{ opacity:0; transition:opacity .3s ease; }
+@keyframes hint-bob{ 0%,100%{ transform:translateY(0); opacity:.75; } 50%{ transform:translateY(4px); opacity:1; } }
+.envelope-wrap.closing{ pointer-events:none; }
+
+/* ============================================================
+   6. CALENDAR CARD (below the letter)
+   ============================================================ */
+.calendar-card{
+  position:relative; width:100%; max-width:320px;
+  background:var(--white); border-radius:18px;
+  box-shadow:var(--shadow); padding:22px 18px 22px;
+  opacity:0; will-change:transform,opacity;
+}
+.cal-corner{
+  position:absolute; font-size:13px; color:var(--rose-gold-dark); opacity:.4; line-height:1;
+}
+.cal-corner.tl{ top:10px; left:12px; }
+.cal-corner.tr{ top:10px; right:12px; transform:scaleX(-1); }
+.calendar-header{ text-align:center; margin-bottom:6px; }
+.calendar-eyebrow{ font-size:10.5px; letter-spacing:3px; text-transform:uppercase; color:var(--ink-soft); }
+.calendar-month{ font-family:var(--font-display); font-size:19px; color:var(--ink); margin-top:2px; }
+.calendar-divider{ text-align:center; font-size:11px; letter-spacing:4px; color:var(--ink-soft); opacity:.7; margin:2px 0 12px; }
+.calendar-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px 3px; }
+.cal-dayname{ text-align:center; font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.5px; padding-bottom:2px; }
+.cal-cell{
+  position:relative; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
+  font-size:12.5px; color:var(--ink); border-radius:50%;
+}
+.cal-empty{ visibility:hidden; }
+.cal-cell.cal-strike{ color:var(--ink-soft); }
+.cal-cell.cal-strike::after{
+  content:'\2715'; position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; color:var(--rose-gold-dark);
+  opacity:0; transform:scale(.4) rotate(-12deg);
+  animation: x-mark-in .28s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes x-mark-in{ to{ opacity:.8; transform:scale(1) rotate(0deg); } }
+.cal-love-pop{
+  position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+  width:16px; height:15px; color:var(--rose-gold-dark);
+  pointer-events:none; will-change:transform,opacity;
+}
+.cal-love-pop svg{ width:100%; height:100%; display:block; }
+.cal-special{
+  background:linear-gradient(160deg, var(--rose), var(--rose-gold-dark));
+  color:#fff; font-weight:700;
+  box-shadow:0 5px 12px -4px rgba(224,130,160,.55);
+  animation: cal-pulse 2.4s ease-in-out infinite;
+}
+.cal-heart{ position:absolute; top:-7px; right:-6px; width:11px; height:10px; color:#fff; }
+.cal-heart svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
+@keyframes cal-pulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.1); } }
+.calendar-caption{
+  text-align:center; margin-top:14px; font-family:var(--font-script); font-style:italic;
+  color:var(--rose-gold-dark); font-size:15px;
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     LOADING SCREEN
+========================================================= -->
+<div id="loading-screen" class="stage">
+  <div class="flower-ring" id="flower-ring"></div>
+  <div class="loading-label">Loading...</div>
+</div>
+
+<!-- =========================================================
+     PIN SCREEN
+========================================================= -->
+<div id="pin-screen" class="stage hidden">
+  <div class="phone-frame">
+    <div class="bg-photo" style="background-image:url('assets/background.jpg')"></div>
+    <div class="bg-overlay"></div>
+    <div id="pin-ambient"></div>
+    <div class="pin-card" id="pin-card">
+      <div class="pin-heart">&#10084;</div>
+      <div class="pin-title" id="pin-title">Happy Birthday</div>
+      <div class="pin-receiver" id="pin-receiver"></div>
+      <div class="pin-hint">Masukkan PIN</div>
+      <div class="pin-error" id="pin-error">PIN salah, coba lagi</div>
+      <div class="pin-dots" id="pin-dots">
+        <span class="pin-dot"></span><span class="pin-dot"></span>
+        <span class="pin-dot"></span><span class="pin-dot"></span>
+      </div>
+      <div class="keypad" id="keypad">
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <div class="key key-empty"></div>
+        <button class="key" data-key="0">0</button>
+        <button class="key key-del" data-key="del">&#9003;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     FLOWER TRANSITION LAYER (stages 1-6, filled dynamically by JS)
+========================================================= -->
+<div id="flower-transition"></div>
+
+<!-- =========================================================
+     LANDING PAGE
+========================================================= -->
+<div id="landing-page" class="stage hidden">
+  <div class="phone-frame">
+    <div class="bg-photo" id="landing-bg-photo" style="background-image:url('assets/background.jpg')"></div>
+    <div class="bg-overlay"></div>
+    <div id="ambient-flowers"></div>
+    <div class="landing-scroll">
+
+      <div class="envelope-wrap" id="envelope-wrap">
+        <div class="envelope" id="envelope">
+          <div class="envelope-shadow"></div>
+          <div class="envelope-letter-peek"></div>
+          <div class="envelope-back"></div>
+          <div class="envelope-flap-back"></div>
+          <div class="envelope-flap" id="envelope-flap"></div>
+          <div class="envelope-seal">&#10084;</div>
+        </div>
+        <div class="envelope-hint">ketuk amplopnya untuk membuka</div>
+      </div>
+
+      <div class="letter hidden" id="letter-card">
+        <span class="letter-corner tl">&#10047;</span>
+        <span class="letter-corner tr">&#10047;</span>
+        <div class="letter-ornament">&#10022; &#9825; &#10022;</div>
+        <div class="letter-title" id="letter-title"></div>
+        <div class="letter-body" id="letter-body"></div>
+        <div class="letter-sign" id="letter-sign"></div>
+        <span class="letter-corner bl">&#10047;</span>
+        <span class="letter-corner br">&#10047;</span>
+      </div>
+
+      <div class="calendar-card hidden" id="calendar-card">
+        <span class="cal-corner tl">&#10047;</span>
+        <span class="cal-corner tr">&#10047;</span>
+        <div class="calendar-header">
+          <div class="calendar-eyebrow">tanggal spesial</div>
+          <div class="calendar-month" id="calendar-month"></div>
+        </div>
+        <div class="calendar-divider">&#8226; &#9825; &#8226;</div>
+        <div class="calendar-grid" id="calendar-grid"></div>
+        <div class="calendar-caption" id="calendar-caption"></div>
+      </div>
+
+      <div class="gallery-heading" id="gallery-heading">
+        <div class="eyebrow">gosok satu per satu</div>
+        <h3>Kenangan Kita</h3>
+      </div>
+      <div class="gallery" id="gallery"></div>
+
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ============================================================
+   CONFIG  —  ubah semua teks & pengaturan di sini
+   ============================================================ */
+const CONFIG = {
+  // ---- Musik latar (paling penting, taruh paling atas biar gampang diubah) ----
+  // Isi salah satu jenis link ini, semua otomatis kedeteksi:
+  //  - file audio langsung: "assets/music.mp3" (.mp3/.wav/.ogg/.m4a)
+  //  - YouTube: "https://www.youtube.com/watch?v=xxxx" atau "https://youtu.be/xxxx"
+  //  - Spotify track/playlist: "https://open.spotify.com/track/xxxx"
+  // Kosongkan ("") kalau tidak mau ada musik.
+  musicUrl: "http://b.top4top.io/m_3753qkv8q1.mp3",
+  musicVolume: 0.55,
+  musicLoop: true,
+
+  // ---- Nama file gambar (semua asset ada di sini biar gampang diganti) ----
+  flowerImages: ["assets/flower1.png","assets/flower2.png","assets/flower3.png","assets/flower4.png"],
+  meteorImage: "assets/sunflower.png",
+
+  password: "2507",
+  receiverName: "Sayang \u2764\uFE0F",
+  senderName: "Dari Aku",
+  letterTitle: "Happy Birthday",
+  letterText:
+`Selamat ulang tahun cintaku...
+Semoga semua impianmu tercapai...
+Aku akan selalu ada untukmu.`,
+  typingSpeed: 40,
+  specialDate: { day: 25, month: 7, year: 2026, label: "Hari kelahiranmu \u2764\uFE0F" },
+  // Jumlah dikurangi tapi ukuran dibesarkan (lihat gridFill) — lebih ringan buat GPU,
+  // tetap menutup layar penuh tanpa celah, dan lebih mulus di refresh rate tinggi (90/120fps).
+  flowerAmount: 70,
+  meteorFlowerAmount: 36,
+  fullscreenFlowerAmount: 100,
+  photos: [
+    "assets/photo1.jpg",
+    "assets/photo2.jpg",
+    "assets/photo3.jpg",
+    "assets/photo4.jpg",
+    "assets/photo5.jpg",
+  ],
+  // ---- Background landing page ----
+  // true  = pakai assets/background.png (pattern bunga penuh, di-zoom biar full cover)
+  // false = balik ke assets/background.jpg / gradient polos seperti semula
+  useBackgroundImage: true,
+  backgroundImageZoom: 1.00, // >1 = di-zoom / diperbesar biar bunga di background.png lebih besar & penuh
+};
+
+/* ============================================================
+   Motion (vanilla "Framer Motion" engine) — spring / easing helpers
+   ============================================================ */
+import { animate } from "https://cdn.jsdelivr.net/npm/motion@11/+esm";
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = (arr) => arr[Math.floor(Math.random()*arr.length)];
+
+/* ---- Deteksi "kekuatan" device supaya tetap smooth di SEMUA device ----
+   HP low-end (RAM/CPU kecil) otomatis dapat jumlah partikel lebih sedikit
+   supaya tetap 60-120fps, HP/laptop kencang dapat jumlah penuh sesuai CONFIG. */
+const DEVICE_TIER = (()=>{
+  const mem = navigator.deviceMemory || 4;      // GB, tidak semua browser support
+  const cores = navigator.hardwareConcurrency || 4;
+  const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reducedMotion) return 0.4;
+  if(mem <= 2 || cores <= 2) return 0.55;   // low-end
+  if(mem <= 4 || cores <= 4) return 0.8;    // mid-range
+  return 1;                                  // flagship/desktop
+})();
+const scaled = (n) => Math.max(1, Math.round(n * DEVICE_TIER));
+
+const FLOWER_IMGS = CONFIG.flowerImages;
+const HEART_SVG = '<svg viewBox="0 0 32 29" fill="currentColor"><path d="M16 28.5c-.3 0-.6-.1-.8-.3C9 22.8 4.6 18.7 2.4 14.9.6 11.8-.1 9 .3 6.7 1 2.7 4.3 0 8.2 0c2.9 0 5.4 1.5 7.1 4.1C17 1.5 19.5 0 22.4 0c3.9 0 7.2 2.7 7.9 6.7.4 2.3-.3 5.1-2.1 8.2-2.2 3.8-6.6 7.9-12.8 13.3-.2.2-.5.3-.8.3z"/></svg>';
+
+// fix mobile viewport height (iOS/Android URL bar issues)
+function setVH(){ document.documentElement.style.setProperty('--vh', `${window.innerHeight*0.01}px`); }
+setVH(); window.addEventListener('resize', setVH); window.addEventListener('orientationchange', setVH);
+
+/* ============================================================
+   0.5 MUSIK LATAR — universal, auto play + loop, TANPA tombol apapun.
+   Mendukung: file audio langsung (.mp3/.wav/.ogg/.m4a), link YouTube,
+   dan link Spotify. Semua diputar tersembunyi (tidak ada UI/kontrol).
+
+   CATATAN JUJUR (kebijakan browser, bukan batasan kode):
+   browser modern MEMBLOKIR autoplay bersuara sebelum ada interaksi
+   pengguna sama sekali. Karena halaman ini SELALU butuh ketukan PIN
+   dulu, kita manfaatkan ketukan tombol PIN pertama (bukan tombol
+   musik — itu tetap ada untuk buka kunci, bukan untuk musik) sebagai
+   pemicu "unlock" audio, jadi begitu diketuk, musik langsung jalan
+   sendiri dan looping selamanya tanpa kontrol apapun yang terlihat.
+   ============================================================ */
+let __musicEl = null;
+function extractYouTubeId(url){
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+function initMusic(){
+  const url = (CONFIG.musicUrl||'').trim();
+  if(!url) return;
+
+  if(/youtube\.com|youtu\.be/i.test(url)){
+    const id = extractYouTubeId(url);
+    if(!id) return;
+    const f = document.createElement('iframe');
+    f.id = 'bg-music-yt';
+    f.style.cssText = 'position:fixed;top:0;left:0;width:2px;height:2px;opacity:0;pointer-events:none;border:0;';
+    f.allow = 'autoplay; encrypted-media';
+    // mulai muted (diizinkan browser tanpa gesture), lalu di-unmute begitu ada ketukan pertama
+    f.src = `https://www.youtube.com/embed/${id}?enablejsapi=1&autoplay=1&mute=1&loop=${CONFIG.musicLoop?1:0}&playlist=${id}&controls=0&playsinline=1&modestbranding=1`;
+    document.body.appendChild(f);
+    __musicEl = { type:'youtube', frame:f };
+    return;
+  }
+
+  if(/spotify\.com/i.test(url)){
+    const embedUrl = url.replace('open.spotify.com/', 'open.spotify.com/embed/');
+    const f = document.createElement('iframe');
+    f.id = 'bg-music-spotify';
+    f.style.cssText = 'position:fixed;top:0;left:0;width:2px;height:2px;opacity:0;pointer-events:none;border:0;';
+    f.allow = 'autoplay; encrypted-media';
+    f.src = embedUrl + (embedUrl.includes('?') ? '&' : '?') + 'autoplay=1';
+    document.body.appendChild(f);
+    __musicEl = { type:'spotify', frame:f };
+    return;
+  }
+
+  // default: file audio langsung (mp3/wav/ogg/m4a/aac atau stream)
+  const audio = document.createElement('audio');
+  audio.id = 'bg-music-audio';
+  audio.src = url;
+  audio.loop = !!CONFIG.musicLoop;
+  audio.preload = 'auto';
+  audio.autoplay = true;
+  audio.volume = CONFIG.musicVolume ?? 0.55;
+  audio.style.display = 'none';
+  document.body.appendChild(audio);
+  __musicEl = { type:'audio', el:audio };
+  audio.play().catch(()=>{ /* diblok browser, akan dicoba lagi saat ada ketukan pertama */ });
+}
+
+function unlockMusic(){
+  if(!__musicEl) return;
+  if(__musicEl.type === 'audio' && __musicEl.el.paused){
+    __musicEl.el.play().catch(()=>{});
+  } else if(__musicEl.type === 'youtube' && __musicEl.frame.contentWindow){
+    // unmute via YouTube iframe postMessage API
+    __musicEl.frame.contentWindow.postMessage(JSON.stringify({event:'command', func:'unMute', args:[]}), '*');
+    __musicEl.frame.contentWindow.postMessage(JSON.stringify({event:'command', func:'playVideo', args:[]}), '*');
+  }
+}
+initMusic();
+document.addEventListener('pointerdown', unlockMusic, { passive:true });
+document.addEventListener('keydown', unlockMusic);
+
+/* ============================================================
+   1. LOADING SCREEN — flower ring + fade text, ~3s
+   ============================================================ */
+(function initLoading(){
+  const ring = $("#flower-ring");
+  const n = 8, radius = 60;
+  for(let i=0;i<n;i++){
+    const img = document.createElement('img');
+    img.src = pick(FLOWER_IMGS);
+    const ang = (360/n)*i;
+    const rad = ang*Math.PI/180;
+    const x = Math.cos(rad)*radius, y = Math.sin(rad)*radius;
+    img.style.transform = `translate(${x-28}px, ${y-28}px) rotate(${ang}deg)`;
+    ring.appendChild(img);
+  }
+  setTimeout(async ()=>{
+    const loadingEl = $("#loading-screen");
+    const pinEl = $("#pin-screen");
+
+    // siapkan pin-screen dulu (mulai transparan & blur) sebelum di-crossfade,
+    // supaya tidak ada momen "kosong" / lompatan mendadak antara loading dan pin
+    pinEl.classList.remove('hidden');
+    pinEl.style.opacity = '0';
+    initPinScreen();
+
+    // intensitas blur diskalakan menurut kekuatan device (blur filter lebih berat
+    // dari sekadar opacity/transform) — device rendah/hemat-gerak dapat blur kecil
+    // atau tanpa blur sama sekali, supaya tetap ringan & mulus di 120fps
+    const blurAmt = DEVICE_TIER >= 0.9 ? 18 : DEVICE_TIER >= 0.7 ? 12 : DEVICE_TIER >= 0.5 ? 6 : 0;
+
+    // hint compositor hanya selama transisi berlangsung (dilepas lagi setelah
+    // selesai) — animasi opacity+scale+filter (tanpa reflow) untuk tetap
+    // ringan & mulus di refresh-rate tinggi (120fps)
+    loadingEl.style.willChange = 'opacity, transform, filter';
+    pinEl.style.willChange = 'opacity, filter';
+
+    // ---- loading memudar + blur keluar, cepat (elemen yang pergi) ----
+    const loadingOut = animate(loadingEl,
+      { opacity:[1,0], scale:[1,1.05], filter:[`blur(0px)`, `blur(${blurAmt*0.6}px)`] },
+      { duration:1.1, easing:[0.4,0,0.2,1] }
+    ).finished;
+
+    // ---- pin-screen tampil cepat, lalu "fokus" pelan-pelan dari blur ke tajam
+    // selama total 2 detik — ini animasi blur yang diminta ----
+    const pinFadeIn = animate(pinEl,
+      { opacity:[0,1] },
+      { duration:0.6, delay:0.15, easing:[0.22,1,0.36,1] }
+    ).finished;
+    const pinFocus = animate(pinEl,
+      { filter:[`blur(${blurAmt}px)`, `blur(0px)`] },
+      { duration:2, easing:[0.16,1,0.3,1] }
+    ).finished;
+
+    await Promise.all([loadingOut, pinFadeIn, pinFocus]);
+
+    loadingEl.classList.add('hidden');
+    loadingEl.style.opacity = '';
+    loadingEl.style.transform = '';
+    loadingEl.style.filter = '';
+    loadingEl.style.willChange = '';
+    pinEl.style.filter = '';
+    pinEl.style.willChange = '';
+  }, 3000);
+})();
+
+/* ============================================================
+   2. PIN SCREEN — keypad, dots, shake on wrong, unlock on correct
+   ============================================================ */
+function initPinScreen(){
+  $("#pin-receiver").textContent = CONFIG.receiverName;
+  $("#pin-title").textContent = CONFIG.letterTitle;
+  spawnPinAmbient();
+
+  let entered = "";
+  const dots = $$(".pin-dot");
+  const card = $("#pin-card");
+  const dotsWrap = $("#pin-dots");
+  const errorLabel = $("#pin-error");
+
+  function refreshDots(){
+    dots.forEach((d,i)=> d.classList.toggle('filled', i < entered.length));
+  }
+
+  function wrongPin(){
+    if(navigator.vibrate) navigator.vibrate([120,60,120]);
+    card.classList.remove('shake'); dotsWrap.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake'); dotsWrap.classList.add('shake');
+    errorLabel.classList.add('show');
+    setTimeout(()=>{ entered=""; refreshDots(); }, 420);
+  }
+
+  function correctPin(){
+    errorLabel.classList.remove('show');
+    $("#pin-screen").classList.add('hidden');
+    startFlowerTransition();
+  }
+
+  $$(".key").forEach(btn=>{
+    if(btn.classList.contains('key-empty')) return;
+    btn.addEventListener('click', (e)=>{
+      btn.classList.add('pressed');
+      setTimeout(()=>btn.classList.remove('pressed'), 120);
+      spawnRipple(btn, e);
+      if(errorLabel.classList.contains('show')) errorLabel.classList.remove('show');
+      const k = btn.dataset.key;
+      if(k === 'del'){ entered = entered.slice(0,-1); refreshDots(); return; }
+      if(entered.length >= 4) return;
+      entered += k; refreshDots();
+      if(entered.length === 4){
+        setTimeout(()=>{
+          if(entered === CONFIG.password) correctPin(); else wrongPin();
+        }, 180);
+      }
+    });
+  });
+}
+
+/* small tactile ripple from tap point, purely decorative */
+function spawnRipple(btn, e){
+  const r = btn.getBoundingClientRect();
+  const t = e.touches ? e.touches[0] : e;
+  const x = (t ? t.clientX : r.left+r.width/2) - r.left;
+  const y = (t ? t.clientY : r.top+r.height/2) - r.top;
+  const ripple = document.createElement('span');
+  ripple.className = 'key-ripple';
+  const size = Math.max(r.width, r.height);
+  ripple.style.width = ripple.style.height = size+'px';
+  ripple.style.left = (x - size/2)+'px';
+  ripple.style.top = (y - size/2)+'px';
+  btn.appendChild(ripple);
+  setTimeout(()=>ripple.remove(), 520);
+}
+
+/* soft ambient sparkles drifting behind the pin card */
+function spawnPinAmbient(){
+  const wrap = $("#pin-ambient");
+  const glyphs = ['\u2726','\u2727','\u2661'];
+  for(let i=0;i<12;i++){
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.textContent = pick(glyphs);
+    s.style.left = rand(2,96)+'%';
+    s.style.top = rand(2,96)+'%';
+    s.style.setProperty('--dur', rand(2.5,5)+'s');
+    s.style.setProperty('--delay', rand(0,4)+'s');
+    wrap.appendChild(s);
+  }
+}
+
+/* ============================================================
+   3. FLOWER TRANSITION — 6 orchestrated stages (Motion powered)
+   ============================================================ */
+async function startFlowerTransition(){
+  const layer = $("#flower-transition");
+  layer.classList.add('active-bg');
+  const vw = window.innerWidth, vh = window.innerHeight;
+
+  // helper: spawn a flower <img> positioned via GPU-accelerated transform (x/y)
+  // instead of left/top, so animation never triggers layout/reflow — this is
+  // the main smoothness fix versus animating left/top. Optional `target` lets
+  // callers batch-insert many flowers into an off-DOM DocumentFragment first
+  // (one single reflow when appended) instead of one reflow per element —
+  // this is what keeps large bursts smooth at 120fps.
+  function spawnFlower(size, target){
+    const el = document.createElement('img');
+    el.src = pick(FLOWER_IMGS);
+    el.className = 'tflower';
+    el.style.width = el.style.height = size+'px';
+    (target || layer).appendChild(el);
+    return el;
+  }
+
+  // helper: jittered-grid positions that GUARANTEE full-screen coverage (no empty
+  // patches) — splits the viewport into cells sized to the flower count, jitters
+  // each point inside its cell, then sizes each flower to slightly overlap its
+  // cell's neighbours so nothing shows through.
+  // FIX: sebelumnya loop berhenti begitu mencapai `count`, jadi baris terakhir
+  // sering terpotong SEBELUM sampai kolom paling kanan/bawah -> lubang di pojok
+  // kanan-bawah. Sekarang grid selalu diisi PENUH (cols*rows sel), jadi tidak
+  // ada sel manapun yang kosong, di pojok manapun.
+  function gridFill(count, w, h){
+    const cols = Math.max(1, Math.round(Math.sqrt(count * (w/h))));
+    const rows = Math.max(1, Math.ceil(count / cols));
+    const cellW = w/cols, cellH = h/rows;
+    const points = [];
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        points.push({
+          x: c*cellW + cellW/2 + rand(-cellW*0.32, cellW*0.32),
+          y: r*cellH + cellH/2 + rand(-cellH*0.32, cellH*0.32),
+        });
+      }
+    }
+    for(let i=points.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [points[i],points[j]]=[points[j],points[i]]; }
+    return { points, size: Math.max(cellW, cellH) };
+  }
+
+  // ---- Stage 1: flowers fly in from all 4 edges until screen fills completely (diperlama) ----
+  const fill1 = gridFill(scaled(CONFIG.flowerAmount), vw, vh);
+  const bloomEls = [];
+  const frag1 = document.createDocumentFragment();
+  for(let i=0;i<fill1.points.length;i++){
+    const size = fill1.size * rand(2.2, 2.7); // sedikit lebih besar -> jamin full coverage, tanpa celah
+    const el = spawnFlower(size, frag1);
+    const p = fill1.points[i];
+    const edge = pick(['top','bottom','left','right']);
+    let sx,sy;
+    if(edge==='top'){ sx = rand(0,vw); sy = -80; }
+    else if(edge==='bottom'){ sx = rand(0,vw); sy = vh+80; }
+    else if(edge==='left'){ sx = -80; sy = rand(0,vh); }
+    else { sx = vw+80; sy = rand(0,vh); }
+    bloomEls.push({ el, sx, sy, tx: p.x - size/2, ty: p.y - size/2, rot: rand(-180,180) });
+  }
+  layer.appendChild(frag1); // satu kali insert/reflow untuk semua elemen, bukan satu-satu
+  await Promise.all(bloomEls.map((f,idx)=> animate(
+    f.el,
+    { x:[f.sx, f.tx], y:[f.sy, f.ty], opacity:[0,1], rotate:[0, f.rot] },
+    { duration: rand(1.5,2.1), delay: idx*0.008, easing:[0.22,1,0.36,1] }
+  ).finished));
+
+  // ---- Stage 2: hold, screen full of flowers (diperlama) ----
+  await new Promise(r=>setTimeout(r, 1400));
+
+  // ---- Stage 3: flowers fall like rain (diperlama) ----
+  await Promise.all(bloomEls.map((f,idx)=> animate(
+    f.el,
+    { y:[f.ty, vh+100], rotate:[f.rot, f.rot + rand(60,200)], opacity:[1,0] },
+    { duration: rand(1.4,1.9), delay: idx*0.006, easing:'ease-in' }
+  ).finished));
+  bloomEls.forEach(f=>f.el.remove());
+
+  // ---- Stage 4: sunflower meteor, melintas diagonal DI DALAM area layar (bukan
+  // menghilang ke bawah viewport) supaya benar-benar kelihatan sebelum impact.
+  // Durasi meteor persis 3 detik sesuai permintaan. ----
+  const sun = document.createElement('img');
+  sun.src = CONFIG.meteorImage; sun.className = 'tsun meteor-blur';
+  layer.appendChild(sun);
+  // mulai dari luar kanan-atas, berakhir di area kiri-bawah TAPI masih dalam batas
+  // layar (bukan vh+60) supaya titik impact & seluruh lintasan terlihat jelas.
+  const meteorStart = { x: vw + 140, y: -vh * 0.22 };
+  const meteorEnd   = { x: vw * 0.08, y: vh * 0.62 };
+  const meteorDuration = 3; // detik — efek meteor bunga berlangsung 3 detik
+
+  // trail cahaya kecil yang mengikuti jejak meteor, disinkronkan ke durasi 3 detik
+  const trailEls = [];
+  const trailCount = scaled(10);
+  for(let i=0;i<trailCount;i++){
+    const t = document.createElement('div');
+    t.className = 'tsun-trail';
+    layer.appendChild(t);
+    trailEls.push(t);
+  }
+  trailEls.forEach((t,i)=>{
+    const p = (i+1)/(trailCount+1);
+    const tx = meteorStart.x + (meteorEnd.x - meteorStart.x)*p;
+    const ty = meteorStart.y + (meteorEnd.y - meteorStart.y)*p;
+    animate(t,
+      { x:[meteorStart.x, tx], y:[meteorStart.y, ty], opacity:[0,.8,0], scale:[0.3,1,0.4] },
+      { duration: meteorDuration*0.35, delay: p*meteorDuration*0.82, easing:'ease-out' }
+    ).finished.then(()=>t.remove());
+  });
+
+  await animate(sun,
+    { x:[meteorStart.x, meteorEnd.x], y:[meteorStart.y, meteorEnd.y], rotate:[0,-35] },
+    { duration: meteorDuration, easing:[0.42,0,0.7,0.3] }
+  ).finished;
+  sun.remove();
+
+  // ---- Stage 5: burst of flowers from the impact point (diperlama) ----
+  const burstEls = [];
+  const cx = meteorEnd.x + 75, cy = meteorEnd.y - 75;
+  const meteorFlowerAmount = scaled(CONFIG.meteorFlowerAmount);
+  const frag5 = document.createDocumentFragment();
+  for(let i=0;i<meteorFlowerAmount;i++){
+    const size = rand(32,64);
+    const el = spawnFlower(size, frag5);
+    const ang = rand(0,360)*Math.PI/180, dist = rand(vw*0.2, vw*0.9);
+    burstEls.push({ el, tx: cx+Math.cos(ang)*dist, ty: cy+Math.sin(ang)*dist, rot: rand(-220,220) });
+  }
+  layer.appendChild(frag5);
+  await Promise.all(burstEls.map((f,idx)=> animate(
+    f.el,
+    { x:[cx, f.tx], y:[cy, f.ty], opacity:[0,1,0], rotate:[0,f.rot] },
+    { duration:2.1, delay: idx*0.01, easing:[0.16,1,0.3,1] }
+  ).finished));
+  burstEls.forEach(f=>f.el.remove());
+
+  // ---- Stage 6: bunga naik dari bawah, menutupi layar penuh — total ~4 detik ----
+  const fill6 = gridFill(scaled(CONFIG.fullscreenFlowerAmount), vw, vh);
+  const riseEls = [];
+  const frag6 = document.createDocumentFragment();
+  for(let i=0;i<fill6.points.length;i++){
+    const size = fill6.size * rand(2.2, 2.7); // sedikit lebih besar -> jamin menutup layar penuh, tanpa celah
+    const el = spawnFlower(size, frag6);
+    const p = fill6.points[i];
+    riseEls.push({ el, sx: p.x - size/2, ty: p.y - size/2, rot: rand(-90,90) });
+  }
+  layer.appendChild(frag6);
+  const riseCount = riseEls.length;
+  await Promise.all(riseEls.map((f,idx)=> animate(
+    f.el,
+    { x:[f.sx, f.sx], y:[vh+60, f.ty], opacity:[0,1], rotate:[0,f.rot] },
+    { duration: rand(2.4,2.8), delay: (idx/riseCount)*1.3, easing:[0.22,1,0.36,1] }
+  ).finished));
+
+  // ---- hold singkat: layar penuh bunga sebelum naik lagi ----
+  await new Promise(r=>setTimeout(r, 450));
+
+  // reveal landing page di baliknya (masih tertutup tirai bunga saat ini)
+  $("#landing-page").classList.remove('hidden');
+  initLandingPage();
+  const envelopeWrap = $("#envelope-wrap");
+
+  // ---- Stage 7: seluruh bunga bergerak naik ke atas bersamaan & lebih pelan (out
+  // diperlambat lagi), lalu amplop menyusul muncul dengan animasinya sendiri begitu
+  // tirai bunga sudah cukup terangkat, bukan langsung nongol sudah jadi ----
+  const curtainUp = Promise.all(riseEls.map((f,idx)=> animate(
+    f.el,
+    { y:[f.ty, -vh*0.85], opacity:[1,0] },
+    { duration: rand(2.6,3.1), delay: (idx/riseCount)*1.1, easing:[0.45,0,0.7,0.15] }
+  ).finished));
+
+  const envelopeIn = envelopeWrap ? (async ()=>{
+    await new Promise(r=>setTimeout(r, 1200)); // menyusul, setelah tirai jelas mulai terangkat
+    await animate(envelopeWrap,
+      { opacity:[0,1], y:[34,0], scale:[0.9,1] },
+      { duration: 1.1, easing:[0.19,1,0.22,1] }
+    ).finished;
+  })() : Promise.resolve();
+
+  await Promise.all([curtainUp, envelopeIn]);
+
+  layer.classList.add('hidden');
+  layer.innerHTML = '';
+  layer.style.opacity = '1';
+}
+
+/* ============================================================
+   4. LANDING PAGE — typing letter, scratch-card photo, ambient flowers
+   ============================================================ */
+let landingInitialized = false;
+async function initLandingPage(){
+  if(landingInitialized) return; landingInitialized = true;
+
+  applyLandingBackground();
+  initAmbientFlowers();
+  initSparkles();
+  initScrollParallax();
+  buildCalendar();
+  setupEnvelope();
+}
+
+/* ---- Toggle antara assets/background.png (pattern bunga, di-zoom) dan bg lama ---- */
+function applyLandingBackground(){
+  const bg = $("#landing-bg-photo");
+  if(!bg) return;
+  if(CONFIG.useBackgroundImage){
+    bg.style.setProperty('--bgz', CONFIG.backgroundImageZoom || 1.35);
+    bg.style.backgroundImage = "url('assets/background.png')";
+    bg.classList.add('bg-pattern');
+  } else {
+    bg.classList.remove('bg-pattern');
+    bg.style.backgroundImage = "url('assets/background.jpg')";
+  }
+}
+
+/* ---- Envelope: waits for a tap, then hands off to the letter-reveal sequence ---- */
+function setupEnvelope(){
+  const envelope = $("#envelope");
+  const wrap = $("#envelope-wrap");
+  let opened = false;
+  envelope.addEventListener('click', async ()=>{
+    if(opened) return; opened = true;
+    wrap.classList.add('closing');
+    envelope.classList.add('open');
+    if(navigator.vibrate) navigator.vibrate(30);
+    await new Promise(r=>setTimeout(r, 550));
+    await revealLetterFromEnvelope(wrap);
+  });
+}
+
+/* ---- Stage: the letter slides up and out of the open envelope, then types itself ---- */
+async function revealLetterFromEnvelope(envelopeWrap){
+  const letter = $("#letter-card");
+  $("#letter-title").textContent = CONFIG.letterTitle;
+  letter.classList.remove('hidden');
+
+  // envelope steps back as the letter takes over its spot
+  await animate(envelopeWrap,
+    { opacity:[1,0], y:[0,-14], scale:[1,0.92] },
+    { duration:0.45, easing:'ease-in' }
+  ).finished;
+  envelopeWrap.style.display = 'none';
+
+  // letter settles in from slightly above with a spring, as if just pulled free
+  await animate(letter,
+    { opacity:[0,1], y:[-34,0], rotate:[7,-2.2], scale:[0.88,1] },
+    { duration:0.9, easing:[0.16,1,0.3,1] }
+  ).finished;
+
+  // idle breathing sway once settled — keeps the letter feeling alive, not static
+  animate(letter,
+    { rotate:[-2.2,-1.2,-2.2], y:[0,-5,0] },
+    { duration:6, easing:'ease-in-out', repeat:Infinity }
+  );
+
+  typeLetter(CONFIG.letterText, $("#letter-body"), CONFIG.typingSpeed, async ()=>{
+    $("#letter-sign").textContent = "— " + CONFIG.senderName;
+    $("#letter-sign").classList.add('show');
+    await revealCalendar();
+    buildGallery();
+  });
+}
+
+/* ---- Calendar: build the month grid once, reveal the card once the letter is done ---- */
+function buildCalendar(){
+  const monthNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  const { day, month, year, label } = CONFIG.specialDate;
+  $("#calendar-month").textContent = `${monthNames[month-1]} ${year}`;
+  $("#calendar-caption").textContent = label;
+
+  const grid = $("#calendar-grid");
+  ["M","S","S","R","K","J","S"].forEach(d=>{
+    const el = document.createElement('div');
+    el.className = 'cal-dayname';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const startOffset = new Date(year, month-1, 1).getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  for(let i=0;i<startOffset;i++){
+    const el = document.createElement('div');
+    el.className = 'cal-cell cal-empty';
+    grid.appendChild(el);
+  }
+  for(let d=1; d<=daysInMonth; d++){
+    const el = document.createElement('div');
+    el.className = 'cal-cell';
+    el.dataset.day = d;
+    el.textContent = d;
+    if(d === day) el.classList.add('cal-target');
+    grid.appendChild(el);
+  }
+}
+
+async function revealCalendar(){
+  const card = $("#calendar-card");
+  card.classList.remove('hidden');
+  await animate(card, { opacity:[0,1], y:[22,0] }, { duration:0.7, easing:[0.16,1,0.3,1] }).finished;
+  await animateCalendarCountdown();
+}
+
+/* ---- Coret satu-satu dari tanggal 1 sampai sehari sebelum ultah, lalu love reveal ---- */
+async function animateCalendarCountdown(){
+  const { day } = CONFIG.specialDate;
+  const grid = $("#calendar-grid");
+  for(let d=1; d<day; d++){
+    const cell = grid.querySelector(`.cal-cell[data-day="${d}"]`);
+    if(cell) cell.classList.add('cal-strike');
+    await new Promise(r=>setTimeout(r, 70));
+  }
+  await new Promise(r=>setTimeout(r, 350));
+  const target = grid.querySelector('.cal-target');
+  await revealLoveOnDay(target);
+}
+
+/* ---- Di tanggal ultah: beberapa hati (svg) muncul satu per satu, pelan, baru menetap jadi badge ---- */
+async function revealLoveOnDay(cell){
+  if(!cell) return;
+  const d = cell.dataset.day;
+  for(let i=0;i<3;i++){
+    const h = document.createElement('span');
+    h.className = 'cal-love-pop';
+    h.innerHTML = HEART_SVG;
+    cell.appendChild(h);
+    await animate(h,
+      { opacity:[0,1,1,0], scale:[0.15,1.3,1,0.5], y:[8,-18] },
+      { duration:1.05, easing:[0.16,1,0.3,1] }
+    ).finished;
+    h.remove();
+    await new Promise(r=>setTimeout(r, 260));
+  }
+  cell.innerHTML = `${d}<span class="cal-heart">${HEART_SVG}</span>`;
+  cell.classList.add('cal-special');
+}
+
+/* Twinkling sparkles scattered across the whole landing screen — cheap, CSS-driven */
+function initSparkles(){
+  const wrap = $("#ambient-flowers");
+  const glyphs = ['\u2726','\u2727','\u2661','\u2739'];
+  for(let i=0;i<16;i++){
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.textContent = pick(glyphs);
+    s.style.left = rand(2,96)+'%';
+    s.style.top = rand(2,96)+'%';
+    s.style.setProperty('--dur', rand(2.5,5)+'s');
+    s.style.setProperty('--delay', rand(0,4)+'s');
+    wrap.appendChild(s);
+  }
+}
+
+/* Subtle parallax: ambient flower/sparkle layer drifts slower than the scroll,
+   giving the full-screen background a sense of depth as the person scrolls. */
+function initScrollParallax(){
+  const scrollEl = $(".landing-scroll");
+  const wrap = $("#ambient-flowers");
+  let ticking = false;
+  scrollEl.addEventListener('scroll', ()=>{
+    if(ticking) return; ticking = true;
+    requestAnimationFrame(()=>{
+      wrap.style.transform = `translateY(${scrollEl.scrollTop*0.18}px)`;
+      ticking = false;
+    });
+  }, { passive:true });
+}
+
+/* Build the 5-photo scattered gallery, each with its own independent scratch card */
+function buildGallery(){
+  const heading = $("#gallery-heading");
+  const gallery = $("#gallery");
+  const rotations = [-6, 4, -3, 5, -4];
+  const captions = ["gosok aku", "buka kenangan", "lihat ini", "senyum ya", "satu lagi"];
+
+  CONFIG.photos.forEach((src, i)=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'polaroid-wrap';
+    wrap.innerHTML = `
+      <div class="polaroid">
+        <span class="polaroid-tape"></span>
+        <div class="photo-holder">
+          <img class="photo" src="${src}" alt="photo ${i+1}">
+          <canvas class="scratch-canvas"></canvas>
+        </div>
+        <div class="polaroid-caption">${captions[i % captions.length]} &#9825;</div>
+        <span class="polaroid-sticker">&#10047;</span>
+      </div>
+      <div class="scratch-hint">gosok fotonya</div>
+    `;
+    gallery.appendChild(wrap);
+  });
+
+  animate(heading, { opacity:[0,1], y:[-14,0] }, { duration:0.6, easing:'ease-out' });
+
+  const cards = $$(".polaroid-wrap", gallery);
+  cards.forEach((card,i)=>{
+    const baseRot = rotations[i % rotations.length];
+    animate(card,
+      { opacity:[0,1], y:[30,0], scale:[0.85,1], rotate:[baseRot+10, baseRot] },
+      { duration:0.7, delay: 0.15 + i*0.12, easing:[0.16,1,0.3,1] }
+    );
+    initScratchCard(card.querySelector('.photo-holder'));
+  });
+}
+
+function typeLetter(text, target, speed, onDone){
+  target.textContent = '';
+  const cursor = document.createElement('span');
+  cursor.className = 'type-cursor'; cursor.textContent = '\u200b';
+  target.appendChild(cursor);
+  let i = 0;
+  (function step(){
+    if(i < text.length){
+      cursor.insertAdjacentText('beforebegin', text[i]);
+      i++;
+      setTimeout(step, speed);
+    } else {
+      cursor.remove();
+      if(onDone) onDone();
+    }
+  })();
+}
+
+function initScratchCard(holder){
+  const canvas = holder.querySelector('.scratch-canvas');
+  const ctx = canvas.getContext('2d');
+  const hint = holder.closest('.polaroid-wrap').querySelector('.scratch-hint');
+  let revealed = false;
+
+  function size(){
+    const r = holder.getBoundingClientRect();
+    canvas.width = r.width; canvas.height = r.height;
+    const img = new Image();
+    img.src = 'assets/scratch.png';
+    img.onload = ()=>{ ctx.drawImage(img,0,0,canvas.width,canvas.height); };
+  }
+  size();
+  window.addEventListener('resize', size);
+
+  function erase(x,y){
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x,y, 26, 0, Math.PI*2);
+    ctx.fill();
+  }
+  function pos(e){
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  }
+  function checkErased(){
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height).data;
+    let cleared = 0, total = data.length/4;
+    for(let i=3;i<data.length;i+=4*8){ if(data[i] < 40) cleared++; } // sample every 8th px
+    const pct = cleared/(total/8);
+    if(pct > 0.65 && !revealed){
+      revealed = true;
+      finishReveal();
+    }
+  }
+  function finishReveal(){
+    animate(canvas, { opacity:[1,0] }, { duration:0.6, easing:'ease-out' }).finished.then(()=>canvas.remove());
+    animate(holder.querySelector('.photo'), { scale:[1,1.06,1] }, { duration:0.7, easing:'ease-out' });
+    hint.textContent = 'Selamat ulang tahun! \u2764\uFE0F';
+    spawnFlowerConfetti(holder);
+  }
+
+  let drawing = false;
+  function start(e){ drawing = true; const p = pos(e); erase(p.x,p.y); }
+  function move(e){ if(!drawing) return; const p = pos(e); erase(p.x,p.y); checkErased(); e.preventDefault(); }
+  function end(){ drawing = false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, {passive:true});
+  canvas.addEventListener('touchmove', move, {passive:false});
+  canvas.addEventListener('touchend', end);
+}
+
+function spawnFlowerConfetti(anchor){
+  const rect = anchor.getBoundingClientRect();
+  const startX = rect.left + rect.width/2, startY = rect.top + rect.height/2;
+  for(let i=0;i<16;i++){
+    const el = document.createElement('img');
+    el.src = pick(FLOWER_IMGS);
+    el.className = 'confetti-piece';
+    document.body.appendChild(el);
+    const ang = rand(0,360)*Math.PI/180, dist = rand(50,150);
+    animate(el, {
+      x:[startX, startX+Math.cos(ang)*dist], y:[startY, startY+Math.sin(ang)*dist],
+      opacity:[1,0], rotate:[0, rand(-180,180)], scale:[0.6,1,0.4]
+    }, { duration: rand(0.7,1.1), easing:[0.16,1,0.3,1] }).finished.then(()=>el.remove());
+  }
+}
+
+/* Ambient softly-falling flowers, looping forever behind letter/photo */
+function initAmbientFlowers(){
+  const wrap = $("#ambient-flowers");
+  const count = scaled(9); // sedikit lebih dikit tapi lebih besar = tetap terasa penuh, lebih ringan buat GPU
+  const vw = () => wrap.clientWidth, vh = () => wrap.clientHeight;
+  function spawn(){
+    const el = document.createElement('img');
+    el.src = pick(FLOWER_IMGS); el.className = 'afl';
+    const size = rand(38,58);
+    el.style.width = el.style.height = size+'px';
+    wrap.appendChild(el);
+    const sx = rand(0, vw());
+    const drift = rand(-40,40);
+    animate(el, {
+      y:[-30, vh()+40], x:[sx, sx+drift],
+      rotate:[0, rand(-120,120)],
+      opacity:[0,.9,.9,0]
+    }, { duration: rand(9,15), easing:'linear' }).finished.then(()=>{ el.remove(); spawn(); });
+  }
+  for(let i=0;i<count;i++){ setTimeout(spawn, i*900); }
+}
+</script>
+</body>
+</html>
